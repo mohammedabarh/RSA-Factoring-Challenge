@@ -1,0 +1,43 @@
+#!/usr/bin/python3
+import sys
+from math import sqrt
+
+def is_prime(n):
+    """Check if a number is prime."""
+    if n < 2:
+        return False
+    for i in range(2, int(sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def factorize_rsa(n):
+    """Factorize an RSA number into two prime factors."""
+    for i in range(2, int(sqrt(n)) + 1):
+        if n % i == 0 and is_prime(i) and is_prime(n // i):
+            return (i, n // i)
+    return None
+
+def main(filename):
+    """Process the file and factorize the RSA number."""
+    try:
+        with open(filename, 'r') as file:
+            n = int(file.read().strip())
+            factors = factorize_rsa(n)
+            if factors:
+                p, q = factors
+                print(f"{n}={p}*{q}")
+            else:
+                print(f"Unable to factorize {n} within the time limit.")
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+        sys.exit(1)
+    except ValueError:
+        print(f"Error: Invalid number in the file.")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: rsa <file>")
+        sys.exit(1)
+    main(sys.argv[1])
