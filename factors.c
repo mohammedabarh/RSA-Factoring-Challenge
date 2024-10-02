@@ -1,19 +1,33 @@
-#!/usr/bin/env python3
+#include "factors.h"
 
-def factorize(n):
-    """Returns two factors of n."""
-    for i in range(2, int(n**0.5) + 1):
-        if n % i == 0:
-            return i, n // i
-    return n, 1  # In case n is prime, which won't happen in this context
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+        return 1;
+    }
 
-def main(filename):
-    with open(filename, 'r') as f:
-        for line in f:
-            n = int(line.strip())
-            p, q = factorize(n)
-            print(f"{n}={p}*{q}")
+    factorize(argv[1]);
+    return 0;
+}
 
-if __name__ == "__main__":
-    import sys
-    main(sys.argv[1])
+void factorize(char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error: Can't open file %s\n", filename);
+        exit(1);
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getline(&line, &len, file)) != -1) {
+        long long n = atoll(line);
+        if (n > 1) {
+            factorize_number(n);
+        }
+    }
+
+    free(line);
+    fclose(file);
+}
