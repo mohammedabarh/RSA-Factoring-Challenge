@@ -1,64 +1,18 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+from sys import argv
 
-import sys
-import random
-from math import gcd
-
-def pollard_rho(n):
-    if n % 2 == 0:
-        return 2
-    
-    def f(x):
-        return (x * x + 1) % n
-    
-    x = random.randint(2, n - 1)
-    y = x
-    d = 1
-    
-    while d == 1:
-        x = f(x)
-        y = f(f(y))
-        d = gcd(abs(x - y), n)
-    
-    if d == n:
-        return pollard_rho(n)
-    else:
-        return d
-
-def is_prime(n):
-    if n < 2:
-        return False
-    for i in range(2, int(n**0.5) + 1):
-        if n % i == 0:
-            return False
-    return True
-
-def factorize_rsa(n):
-    if is_prime(n):
-        return n, 1
-    
-    factor = pollard_rho(n)
-    if is_prime(factor):
-        return factor, n // factor
-    else:
-        return factorize_rsa(factor)
-
-def main(filename):
-    try:
-        with open(filename, 'r') as file:
-            n = int(file.read().strip())
-            if n > 1:
-                p, q = factorize_rsa(n)
-                print(f"{n}={p}*{q}")
-    except FileNotFoundError:
-        print(f"Error: File '{filename}' not found.")
-        sys.exit(1)
-    except ValueError:
-        print(f"Error: Invalid number in the file.")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: rsa <file>")
-        sys.exit(1)
-    main(sys.argv[1])
+with open(argv[1]) as f:
+    for line in f:
+        num = int(line)
+        print("{:d}=".format(num), end="")
+        if num % 2 == 0:
+            print("{}*2".format(num//2))
+            continue
+        for i in range(3, num, 2):
+            if num % i == 0:
+                factor = num//i
+                for j in range(3, factor, 2):
+                    if factor % j == 0 or i % j == 0:
+                        break
+                print("{}*{}".format(factor, i))
+                break
