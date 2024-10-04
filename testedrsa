@@ -5,7 +5,7 @@ from math import sqrt
 
 
 def read_test_file(file_name):
-    """Function to read numbers from file: one on each line"""
+    """Function to read number from file: one number per file"""
 
     with open(file_name, "r", encoding="utf-8") as file:
         lines = file.readlines()
@@ -13,7 +13,7 @@ def read_test_file(file_name):
     number_to_factor = []
 
     for line in lines:
-        number_to_factor.append(int(line))
+        number_to_factor.append(int(line.strip()))
 
     return number_to_factor
 

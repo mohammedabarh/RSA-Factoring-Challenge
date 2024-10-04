@@ -1,18 +1,73 @@
-#!/usr/bin/python3
-from sys import argv
+#!/usr/bin/env python3
 
-with open(argv[1]) as f:
-    for line in f:
-        num = int(line)
-        print("{:d}=".format(num), end="")
-        if num % 2 == 0:
-            print("{}*2".format(num//2))
-            continue
-        for i in range(3, num, 2):
-            if num % i == 0:
-                factor = num//i
-                for j in range(3, factor, 2):
-                    if factor % j == 0 or i % j == 0:
-                        break
-                print("{}*{}".format(factor, i))
-                break
+from sys import argv, exit
+from math import gcd
+from random import randint
+from time import time
+
+
+def read_test_file(file_name):
+    """Function to read number from file: one number per file"""
+
+    with open(file_name, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+
+    number_to_factor = []
+
+    for line in lines:
+        # Check if the number has 100 or more digits
+        n = int(line.strip())
+        if n >= 10**99:
+            factors = pollard_rho(n)
+            print("{}={}*{}".format(n, factors[0], factors[1]))
+        else:
+            find_numbers(n)
+
+    return number_to_factor
+
+
+def find_numbers(n):
+    """Function to find factors of current number"""
+
+    for i in range(1, n):
+        if n % i == 0:
+            print("{}={}*{}".format(n, (n // i), i))
+            break
+
+
+def pollard_rho(n):
+    """Function to factor a number using the Pollard Rho algorithm"""
+
+    start_time = time()
+
+    x = randint(0, n - 1)
+    y = x
+    c = randint(1, n - 1)
+    d = 1
+
+    while d == 1:
+
+        if time() - start_time > 4:
+            exit(100)
+
+        x = (x*x + c) % n
+        y = (y*y + c) % n
+        y = (y*y + c) % n
+        d = gcd(abs(x - y), n)
+
+    if d == n:
+        return pollard_rho(n)
+
+    return (d, n // d)
+
+
+def factors(ls):
+    """Function to iterate between numbers in file"""
+
+    for i in ls:
+        find_numbers(i)
+
+
+if len(argv) == 2:
+    factors(read_test_file(argv[1]))
+
