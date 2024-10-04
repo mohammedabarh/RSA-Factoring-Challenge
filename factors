@@ -3,29 +3,20 @@
 import sys
 import math
 
-def is_prime(n):
-    if n < 2:
-        return False
+def factorize(n):
     for i in range(2, int(math.sqrt(n)) + 1):
         if n % i == 0:
-            return False
-    return True
-
-def factorize_rsa(n):
-    for i in range(2, int(math.sqrt(n)) + 1):
-        if n % i == 0 and is_prime(i) and is_prime(n // i):
             return i, n // i
     return None
 
 def main(filename):
     try:
         with open(filename, 'r') as file:
-            n = int(file.read().strip())
-            factors = factorize_rsa(n)
-            if factors:
-                print(f"{n}={factors[1]}*{factors[0]}")
-            else:
-                print(f"Unable to factorize {n} into two prime factors.")
+            for line in file:
+                n = int(line.strip())
+                factors = factorize(n)
+                if factors:
+                    print(f"{n}={factors[1]}*{factors[0]}")
     except FileNotFoundError:
         print(f"Error: File '{filename}' not found.")
     except ValueError:
@@ -35,6 +26,6 @@ def main(filename):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: ./rsa <file>")
+        print("Usage: ./factors <file>")
         sys.exit(1)
     main(sys.argv[1])
