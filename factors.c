@@ -2,22 +2,22 @@
 
 int main()
 {
-    long long int num = 239809320265259;
-    long int factor1 = 2;
-    long int factor2;
+    long long int target_number = 239809320265259;
+    long int divisor = 2;
+    long int quotient;
 
-    while (num % factor1)
+    while (target_number % divisor)
     {
-        if (factor1 <= num)
+        if (divisor <= target_number)
         {
-            factor1++;
+            divisor++;
         }
         else {
             return (-1);
         }
     }
 
-    factor2 = num / factor1;
-    printf("%lld = %ld * %ld\n", num, factor2, factor1);
+    quotient = target_number / divisor;
+    printf("%lld = %ld * %ld\n", target_number, quotient, divisor);
     return (0);
 }
