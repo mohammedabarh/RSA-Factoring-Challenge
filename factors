@@ -1,35 +1,27 @@
 #!/usr/bin/env python3
-
+"""Factor numbers from a given file."""
 from sys import argv
-from math import sqrt
+from math import isqrt
 
+def read_numbers_from_file(file_path):
+    """Read integers from a file and return them as a list."""
+    with open(file_path, "r", encoding="utf-8") as file:
+        return [int(line.strip()) for line in file]
 
-def read_test_file(file_name):
-    """Function to read numbers from file: one on each line"""
+def find_factors(num):
+    """Find and print two factors of the given number."""
+    for factor in range(2, isqrt(num) + 1):
+        if num % factor == 0:
+            print(f"{num}={num // factor}*{factor}")
+            return
+    # If no factors are found, print the number as a product of 1 and itself
+    print(f"{num}=1*{num}")
 
-    with open(file_name, "r", encoding="utf-8") as file:
-        lines = file.readlines()
+def factorize_numbers(numbers):
+    """Factor each number in the provided list."""
+    for number in numbers:
+        find_factors(number)
 
-    number_to_factor = []
-
-    for line in lines:
-        number_to_factor.append(int(line))
-
-    return number_to_factor
-
-def find_numbers(n):
-    """Function to find factors of current number"""
-
-    for i in range(1, n):
-        if n == ((n // i) * i):
-            print("{}={}*{}".format(n, (n // i), i))
-            break
-
-def factors(ls):
-    """Function to iterate between numbers in file"""
-
-    for i in ls:
-        find_numbers(i)
-
-if len(argv) == 2:
-    factors(read_test_file(argv[1]))
+if __name__ == "__main__":
+    if len(argv) == 2:
+        factorize_numbers(read_numbers_from_file(argv[1]))
