@@ -1,21 +1,23 @@
 #include <stdio.h>
-#include <math.h>
 
-int main(int argc, char *argv[]) {
-    long long int number;
-    // Read the number from input
-    scanf("%lld", &number);
-    long long int factor1, factor2;
+int main()
+{
+    long long int num = 239809320265259;
+    long int factor1 = 2;
+    long int factor2;
 
-    // Loop to find factors of the number
-    for (factor1 = 2; factor1 <= sqrt(number); factor1++) {
-        if (number % factor1 == 0) {
-            factor2 = number / factor1;
-            printf("%lld = %lld * %lld\n", number, factor2, factor1);
-            return 0;
+    while (num % factor1)
+    {
+        if (factor1 <= num)
+        {
+            factor1++;
+        }
+        else {
+            return (-1);
         }
     }
-    // If no factors found, print the number as a product of 1 and itself
-    printf("%lld = 1 * %lld\n", number, number);
-    return 0;
+
+    factor2 = num / factor1;
+    printf("%lld = %ld * %ld\n", num, factor2, factor1);
+    return (0);
 }
