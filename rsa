@@ -1,32 +1,35 @@
 #!/usr/bin/python3
-"""RSA Factorization Script"""
+"""RSA Factorization Module"""
 from sys import argv
+from math import isqrt
 
-def factorize_rsa(filename):
+
+def find_prime_divisors(target):
     """
-    Factorize numbers from a file using a simple RSA approach.
-    
-    Args:
-        filename (str): Path to the input file.
+    Find prime divisors of a given number
     """
-    with open(filename) as input_file:
+    for potential_divisor in range(2, isqrt(target) + 1):
+        if target % potential_divisor == 0:
+            if all(potential_divisor % j != 0 for j in range(2, isqrt(potential_divisor) + 1)):
+                quotient = target // potential_divisor
+                if all(quotient % j != 0 for j in range(2, isqrt(quotient) + 1)):
+                    return quotient, potential_divisor
+    return target, 1
+
+
+def process_file(file_path):
+    """
+    Process numbers from a file and print their prime factors
+    """
+    with open(file_path) as input_file:
         for line in input_file:
-            number = int(line)
-            print(f"{number:d}=", end="")
-            
-            if number % 2 == 0:
-                print(f"{number//2}*2")
-                continue
-            
-            for divisor in range(3, number, 2):
-                if number % divisor == 0:
-                    quotient = number // divisor
-                    for potential_factor in range(3, quotient, 2):
-                        if quotient % potential_factor == 0 or divisor % potential_factor == 0:
-                            break
-                    print(f"{quotient}*{divisor}")
-                    break
+            current_number = int(line.strip())
+            factor_p, factor_q = find_prime_divisors(current_number)
+            print(f"{current_number}={factor_p}*{factor_q}")
+
 
 if __name__ == "__main__":
-    if len(argv) == 2:
-        factorize_rsa(argv[1])
+    if len(argv) != 2:
+        print(f"Usage: {argv[0]} <file>")
+        exit(1)
+    process_file(argv[1])
