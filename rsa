@@ -1,33 +1,56 @@
 #!/usr/bin/python3
 """
-RSA Factoring Challenge
+RSA Factoring Challenge - Optimized version
 """
 import sys
 import time
-from math import isqrt
+from math import gcd, isqrt
 
 
-def is_prime(n):
-    """Check if a number is prime."""
-    if n < 2:
-        return False
-    for i in range(2, isqrt(n) + 1):
-        if n % i == 0:
-            return False
-    return True
+def pollards_rho(n):
+    """Pollard's Rho algorithm for factorization"""
+    if n % 2 == 0:
+        return 2
+    
+    x = 2
+    y = 2
+    d = 1
+    f = lambda x: (x**2 + 1) % n
+    
+    while d == 1:
+        x = f(x)
+        y = f(f(y))
+        d = gcd(abs(x - y), n)
+    
+    if d == n:
+        return None
+    return d
 
 
 def find_prime_factors(n):
-    """Find two prime factors of n."""
-    for i in range(2, isqrt(n) + 1):
+    """Find two prime factors of n using multiple methods"""
+    # Try small primes first
+    small_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]
+    for p in small_primes:
+        if n % p == 0:
+            return p, n // p
+
+    # Use Pollard's Rho algorithm
+    factor = pollards_rho(n)
+    if factor:
+        return factor, n // factor
+
+    # Fallback to trial division if Pollard's Rho fails
+    limit = isqrt(n)
+    for i in range(41, limit + 1, 2):
         if n % i == 0:
-            if is_prime(i) and is_prime(n // i):
-                return i, n // i
+            return i, n // i
+
     return None
 
 
 def factorize_rsa(file_path):
-    """Factorize the number in the given file."""
+    """Factorize the number in the given file"""
     try:
         with open(file_path, 'r') as file:
             n = int(file.read().strip())
@@ -45,7 +68,7 @@ def factorize_rsa(file_path):
     else:
         print(f"Unable to factorize {n} within the time limit.")
 
-    print(f"Time taken: {end_time - start_time:.2f} seconds")
+    print(f"Time taken: {end_time - start_time:.6f} seconds")
 
 
 if __name__ == "__main__":
