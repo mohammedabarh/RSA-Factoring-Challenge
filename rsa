@@ -1,28 +1,45 @@
 #!/usr/bin/python3
-"""RSA Factorization Challenge"""
-from sys import argv
-from math import isqrt
+"""Module for factorizing numbers from a file"""
+import sys
 
-def find_prime_factors(num):
-    """Find prime factors of a number"""
-    for i in range(2, isqrt(num) + 1):
-        if num % i == 0:
-            if all(i % j != 0 for j in range(2, isqrt(i) + 1)):
-                factor = num // i
-                if all(factor % j != 0 for j in range(2, isqrt(factor) + 1)):
-                    return factor, i
-    return num, 1
 
-def factorize_file(filename):
-    """Factorize numbers from a file"""
-    with open(filename) as f:
-        for line in f:
-            num = int(line.strip())
-            p, q = find_prime_factors(num)
-            print(f"{num}={p}*{q}")
+def find_factors(target):
+    """
+    Generate two factors for a given number.
+
+    Args:
+        target (int): Number to factorize.
+
+    Returns:
+        tuple: A pair of factors (larger_factor, smaller_factor).
+    """
+    smaller_factor = 2
+    while target % smaller_factor:
+        if smaller_factor <= target:
+            smaller_factor += 1
+
+    larger_factor = target // smaller_factor
+    return (larger_factor, smaller_factor)
+
+
+def main():
+    """Main function to process the input file and factorize numbers."""
+    if len(sys.argv) != 2:
+        sys.exit(f"Usage: {sys.argv[0]} <file_path>")
+
+    input_file = sys.argv[1]
+
+    try:
+        with open(input_file, 'r') as file:
+            for line in file:
+                number = int(line.strip())
+                larger, smaller = find_factors(number)
+                print(f"{number} = {larger} * {smaller}")
+    except FileNotFoundError:
+        sys.exit(f"Error: File '{input_file}' not found.")
+    except ValueError:
+        sys.exit("Error: Invalid number in the input file.")
+
 
 if __name__ == "__main__":
-    if len(argv) != 2:
-        print(f"Usage: {argv[0]} <file>")
-        exit(1)
-    factorize_file(argv[1])
+    main()
