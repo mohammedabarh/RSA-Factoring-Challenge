@@ -1,31 +1,56 @@
-#!/usr/bin/env python3
-
+#!/usr/bin/python3
+"""
+RSA Factoring Challenge
+"""
 import sys
-from math import sqrt
+import time
+from math import isqrt
+
 
 def is_prime(n):
+    """Check if a number is prime."""
     if n < 2:
         return False
-    for i in range(2, int(sqrt(n)) + 1):
+    for i in range(2, isqrt(n) + 1):
         if n % i == 0:
             return False
     return True
 
-def factorize_rsa(n):
-    for i in range(2, int(sqrt(n)) + 1):
-        if n % i == 0 and is_prime(i) and is_prime(n // i):
-            return i, n // i
+
+def find_prime_factors(n):
+    """Find two prime factors of n."""
+    for i in range(2, isqrt(n) + 1):
+        if n % i == 0:
+            if is_prime(i) and is_prime(n // i):
+                return i, n // i
     return None
 
-def main(filename):
-    with open(filename, 'r') as file:
-        n = int(file.read().strip())
-        factors = factorize_rsa(n)
-        if factors:
-            print(f"{n}={factors[1]}*{factors[0]}")
+
+def factorize_rsa(file_path):
+    """Factorize the number in the given file."""
+    try:
+        with open(file_path, 'r') as file:
+            n = int(file.read().strip())
+    except (IOError, ValueError):
+        print(f"Error: Unable to read or parse the file {file_path}")
+        return
+
+    start_time = time.time()
+    factors = find_prime_factors(n)
+    end_time = time.time()
+
+    if factors:
+        p, q = factors
+        print(f"{n}={p}*{q}")
+    else:
+        print(f"Unable to factorize {n} within the time limit.")
+
+    print(f"Time taken: {end_time - start_time:.2f} seconds")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: rsa <file>")
+        print(f"Usage: {sys.argv[0]} <file>")
         sys.exit(1)
-    main(sys.argv[1])
+
+    factorize_rsa(sys.argv[1])
