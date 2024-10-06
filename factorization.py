@@ -1,26 +1,45 @@
 #!/usr/bin/python3
-"""Efficient Factorization Module"""
+"""Module for factorizing numbers from a file"""
 import sys
-from math import isqrt
 
 
-def compute_factors(target):
+def find_factors(target):
     """
-    Compute two factors for a given number
+    Generate two factors for a given number.
+
+    Args:
+        target (int): Number to factorize.
+
+    Returns:
+        tuple: A pair of factors (larger_factor, smaller_factor).
     """
-    for potential_factor in range(2, isqrt(target) + 1):
-        if target % potential_factor == 0:
-            return target // potential_factor, potential_factor
-    return target, 1
+    smaller_factor = 2
+    while target % smaller_factor:
+        if smaller_factor <= target:
+            smaller_factor += 1
+
+    larger_factor = target // smaller_factor
+    return (larger_factor, smaller_factor)
 
 
-if len(sys.argv) != 2:
-    sys.exit(f"Usage: {sys.argv[0]} <file_path>")
+def main():
+    """Main function to process the input file and factorize numbers."""
+    if len(sys.argv) != 2:
+        sys.exit(f"Usage: {sys.argv[0]} <file_path>")
 
-input_file_path = sys.argv[1]
+    input_file = sys.argv[1]
 
-with open(input_file_path, 'r') as input_file:
-    for line in input_file:
-        current_number = int(line.strip())
-        large_factor, small_factor = compute_factors(current_number)
-        print(f"{current_number} = {large_factor} * {small_factor}")
+    try:
+        with open(input_file, 'r') as file:
+            for line in file:
+                number = int(line.strip())
+                larger, smaller = find_factors(number)
+                print(f"{number} = {larger} * {smaller}")
+    except FileNotFoundError:
+        sys.exit(f"Error: File '{input_file}' not found.")
+    except ValueError:
+        sys.exit("Error: Invalid number in the input file.")
+
+
+if __name__ == "__main__":
+    main()

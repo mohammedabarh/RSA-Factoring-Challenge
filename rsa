@@ -1,35 +1,64 @@
-#!/usr/bin/python3
-"""RSA Factorization Module"""
-from sys import argv
-from math import isqrt
+#!/usr/bin/env python3
 
+import sys
+import random
+from math import gcd
 
-def find_prime_divisors(target):
-    """
-    Find prime divisors of a given number
-    """
-    for potential_divisor in range(2, isqrt(target) + 1):
-        if target % potential_divisor == 0:
-            if all(potential_divisor % j != 0 for j in range(2, isqrt(potential_divisor) + 1)):
-                quotient = target // potential_divisor
-                if all(quotient % j != 0 for j in range(2, isqrt(quotient) + 1)):
-                    return quotient, potential_divisor
-    return target, 1
+def pollard_rho(n):
+    if n % 2 == 0:
+        return 2
+    
+    def f(x):
+        return (x * x + 1) % n
+    
+    x = random.randint(2, n - 1)
+    y = x
+    d = 1
+    
+    while d == 1:
+        x = f(x)
+        y = f(f(y))
+        d = gcd(abs(x - y), n)
+    
+    if d == n:
+        return pollard_rho(n)
+    else:
+        return d
 
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
 
-def process_file(file_path):
-    """
-    Process numbers from a file and print their prime factors
-    """
-    with open(file_path) as input_file:
-        for line in input_file:
-            current_number = int(line.strip())
-            factor_p, factor_q = find_prime_divisors(current_number)
-            print(f"{current_number}={factor_p}*{factor_q}")
+def factorize_rsa(n):
+    if is_prime(n):
+        return n, 1
+    
+    factor = pollard_rho(n)
+    if is_prime(factor):
+        return factor, n // factor
+    else:
+        return factorize_rsa(factor)
 
+def main(filename):
+    try:
+        with open(filename, 'r') as file:
+            n = int(file.read().strip())
+            if n > 1:
+                p, q = factorize_rsa(n)
+                print(f"{n}={p}*{q}")
+    except FileNotFoundError:
+        print(f"Error: File '{filename}' not found.")
+        sys.exit(1)
+    except ValueError:
+        print(f"Error: Invalid number in the file.")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    if len(argv) != 2:
-        print(f"Usage: {argv[0]} <file>")
-        exit(1)
-    process_file(argv[1])
+    if len(sys.argv) != 2:
+        print("Usage: rsa <file>")
+        sys.exit(1)
+    main(sys.argv[1])
