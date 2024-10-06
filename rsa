@@ -1,45 +1,32 @@
 #!/usr/bin/python3
-"""Module for factorizing numbers from a file"""
-import sys
+"""RSA Factorization Script"""
+from sys import argv
 
-
-def find_factors(target):
+def factorize_rsa(filename):
     """
-    Generate two factors for a given number.
-
+    Factorize numbers from a file using a simple RSA approach.
+    
     Args:
-        target (int): Number to factorize.
-
-    Returns:
-        tuple: A pair of factors (larger_factor, smaller_factor).
+        filename (str): Path to the input file.
     """
-    smaller_factor = 2
-    while target % smaller_factor:
-        if smaller_factor <= target:
-            smaller_factor += 1
-
-    larger_factor = target // smaller_factor
-    return (larger_factor, smaller_factor)
-
-
-def main():
-    """Main function to process the input file and factorize numbers."""
-    if len(sys.argv) != 2:
-        sys.exit(f"Usage: {sys.argv[0]} <file_path>")
-
-    input_file = sys.argv[1]
-
-    try:
-        with open(input_file, 'r') as file:
-            for line in file:
-                number = int(line.strip())
-                larger, smaller = find_factors(number)
-                print(f"{number} = {larger} * {smaller}")
-    except FileNotFoundError:
-        sys.exit(f"Error: File '{input_file}' not found.")
-    except ValueError:
-        sys.exit("Error: Invalid number in the input file.")
-
+    with open(filename) as input_file:
+        for line in input_file:
+            number = int(line)
+            print(f"{number:d}=", end="")
+            
+            if number % 2 == 0:
+                print(f"{number//2}*2")
+                continue
+            
+            for divisor in range(3, number, 2):
+                if number % divisor == 0:
+                    quotient = number // divisor
+                    for potential_factor in range(3, quotient, 2):
+                        if quotient % potential_factor == 0 or divisor % potential_factor == 0:
+                            break
+                    print(f"{quotient}*{divisor}")
+                    break
 
 if __name__ == "__main__":
-    main()
+    if len(argv) == 2:
+        factorize_rsa(argv[1])
